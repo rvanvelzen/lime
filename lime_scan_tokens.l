@@ -28,76 +28,76 @@ void php();
 %x dquote
 %x squote
 
-CHAR	\n|.
+CHAR		\n|.
 
-ALPHA [a-zA-Z]
-DIGIT [0-9]
-ALNUM {ALPHA}|{DIGIT}
-WORD {ALNUM}|_
-STOP "."
+ALPHA		[a-zA-Z]
+DIGIT		[0-9]
+ALNUM		{ALPHA}|{DIGIT}
+WORD		{ALNUM}|_
+STOP		"."
 
-SYM {ALPHA}{WORD}*'*
-LIT '.'
+SYM			{ALPHA}{WORD}*'*
+LIT			'.'
 
-ESC "\"{CHAR}
-SCHAR [^\']|ESC
-DCHAR [^\"]|ESC
-COM "//"|"#"
+ESC			"\"{CHAR}
+SCHAR		[^\']|ESC
+DCHAR		[^\"]|ESC
+COM			"//"|"#"
 
-CC [^*\n]
-CX "*"+{CC}+
-CT "*"+"/"
-BLOCKCMT "/*"({CC}|{CX})*{CT}
+CC			[^*\n]
+CX			"*"+{CC}+
+CT			"*"+"/"
+BLOCKCMT	"/*"({CC}|{CX})*{CT}
 
 %x pragma
 
 
 %%
 
-[[:space:]]+ {}
-#.* {}
+[[:space:]]+	{}
+#.*				{}
 
 {STOP} 			out("stop", ".");
 {SYM} 			tok("sym");
 {LIT}			tok("lit");
 {BLOCKCMT}		{}
-"/"{WORD}+		|
+"/"{WORD}+ |
 "/$"			out("lambda", yytext+1);
 "%"{WORD}+ 		{
 	out("pragma", yytext+1);
 	yy_push_state(pragma);
 }
 
-<*>"{"		{
+<*>"{"			{
 	lit();
 	yy_push_state(code);
 }
 
-.	lit();
+.				lit();
 
 
 <pragma>{
-\n {
-	out("stop", ".");
-	yy_pop_state();
-}
-[[:space:]] {}
-{SYM} 			tok("sym");
-{LIT}			tok("lit");
-.	lit();
+	\n			{
+		out("stop", ".");
+		yy_pop_state();
+	}
+	[[:space:]]	{}
+	{SYM} 		tok("sym");
+	{LIT}		tok("lit");
+	.			lit();
 }
 
 <code>{
-"}" {
-	lit();
-	yy_pop_state();
-}
-'{SCHAR}*'		php();
-\"{DCHAR}*\"	php();
-{COM}.*			php();
-{BLOCKCMT}		php();
-[^{}'"#/]+		php();
-.				php();
+	"}"			{
+		lit();
+		yy_pop_state();
+	}
+	'{SCHAR}*'		php();
+	\"{DCHAR}*\"	php();
+	{COM}.*			php();
+	{BLOCKCMT}		php();
+	[^{}'"#/]+		php();
+	.				php();
 }
 
 %%

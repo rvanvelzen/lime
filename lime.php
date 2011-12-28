@@ -17,6 +17,7 @@
  */
 
 define('LIME_DIR', __DIR__);
+define('INDENT', '  ');
 
 function emit($str) {
 	fputs(STDERR, $str . PHP_EOL);
@@ -66,11 +67,11 @@ function lime_export($var) {
 			$out[] = (!$i ? lime_export($k).' => ' : '') . lime_export($v);
 		}
 
-		$result = 'array(' . PHP_EOL . preg_replace('~^~m', "\t", implode(',' . PHP_EOL, $out)) . PHP_EOL . ')';
+		$result = 'array(' . PHP_EOL . preg_replace('~^~m', INDENT, implode(',' . PHP_EOL, $out)) . PHP_EOL . ')';
 	} elseif (is_int($var) || is_float($var)) {
 		$result = (string)$var;
 	} elseif (is_string($var)) {
-		$opt1 = "'" . str_replace(array('\\', "'"), array('\\\\', "\'"), $var) . "'";
+		$opt1 = '\'' . str_replace(array('\\', '\''), array('\\\\', '\\\''), $var) . '\'';
 		$opt2 = $opt1;
 
 		if (strpos($var, '$') === false) {
@@ -254,12 +255,16 @@ class RRC extends Exception {
 }
 
 class state {
+	public $id;
+	public $key;
+	public $close;
+	public $action = array();
+
 	public function __construct($id, $key, $close) {
 		$this->id = $id;
 		$this->key = $key;
 		$this->close = $close; // config key -> object
 		ksort($this->close);
-		$this->action = array();
 	}
 
 	public function dump() {
@@ -1049,7 +1054,7 @@ class lime_language_php extends lime_language {
 			$php = $this->to_php($a['code']);
 
 			$code .= 'function ' . $mn . '(' . LIME_CALL_PROTOCOL . ') {' . PHP_EOL .
-				preg_replace('~^~m', "\t", $comment . $php) . PHP_EOL .
+				rtrim(preg_replace('~^~m', INDENT, $comment . $php)) . PHP_EOL .
 			'}' .
 			PHP_EOL .
 			PHP_EOL;
@@ -1063,7 +1068,7 @@ class lime_language_php extends lime_language {
 		$code .= 'public $a = '.lime_export($rules, true) . ';' . PHP_EOL;
 
 		return 'class ' . $parser_class . ' extends lime_parser {' . PHP_EOL .
-			preg_replace(array('~^~m', '~^\h+$~m'), array("\t", ''), $code) .
+			preg_replace(array('~^~m', '~^\h+$~m'), array(INDENT, ''), $code) .
 		'}' . PHP_EOL;
 	}
 }
@@ -1153,12 +1158,15 @@ class lime_rewrite {
 	}
 }
 
+/**
+ * This keeps track of one position in an rhs.
+ *  We specialize to handle actions and glyphs.
+ *
+ * If there is a name for the slot, we store it here.
+ * Later on, this structure will be consulted in the formation of
+ * actual production rules.
+ */
 class lime_slot {
-	// This keeps track of one position in an rhs.
-	// We specialize to handle actions and glyphs.
-	// If there is a name for the slot, we store it here.
-	// Later on, this structure will be consulted in the formation of
-	// actual production rules.
 	public function __construct($data, $name) {
 		$this->data = $data;
 		$this->name = $name;
@@ -1175,34 +1183,32 @@ class lime_glyph extends lime_slot {
 }
 class lime_action extends lime_slot {
 }
+
+
+/**
+ * This function isn't too terribly interesting to the casual observer.
+ * You're probably better off looking at parse_lime_grammar() instead.
+ *
+ * Ok, if you insist, I'll explain.
+ *
+ * The input to Lime is a CFG parser definition. That definition is
+ * written in some language. (The Lime language, to be exact.)
+ * Anyway, I have to parse the Lime language and compile it into a
+ * very complex data structure from which a parser is eventually
+ * built. What better way than to use Lime itself to parse its own
+ * language? Well, it's almost that simple, but not quite.
+
+ * The Lime language is fairly potent, but a restricted subset of
+ * its features was used to write a metagrammar. Then, I hand-translated
+ * that metagrammar into another form which is easy to snarf up.
+ * In the process of reading that simplified form, this function
+ * builds the same sort of data structure that later gets turned into
+ * a parser. The last step is to run the parser generation algorithm,
+ * eval() the resulting PHP code, and voila! With no hard work, I can
+ * suddenly read and comprehend the full range of the Lime language
+ * without ever having written an algorithm to do so. It feels like magic.
+ */
 function lime_bootstrap() {
-
-	/*
-
-	This function isn't too terribly interesting to the casual observer.
-	You're probably better off looking at parse_lime_grammar() instead.
-
-	Ok, if you insist, I'll explain.
-
-	The input to Lime is a CFG parser definition. That definition is
-	written in some language. (The Lime language, to be exact.)
-	Anyway, I have to parse the Lime language and compile it into a
-	very complex data structure from which a parser is eventually
-	built. What better way than to use Lime itself to parse its own
-	language? Well, it's almost that simple, but not quite.
-
-	The Lime language is fairly potent, but a restricted subset of
-	its features was used to write a metagrammar. Then, I hand-translated
-	that metagrammar into another form which is easy to snarf up.
-	In the process of reading that simplified form, this function
-	builds the same sort of data structure that later gets turned into
-	a parser. The last step is to run the parser generation algorithm,
-	eval() the resulting PHP code, and voila! With no hard work, I can
-	suddenly read and comprehend the full range of the Lime language
-	without ever having written an algorithm to do so. It feels like magic.
-
-	*/
-
 	$bootstrap = LIME_DIR . '/lime.bootstrap';
 	$lime = new lime();
 	$lime->parser_class = 'lime_metaparser';
@@ -1245,31 +1251,29 @@ function lime_bootstrap() {
 	eval($parser_code);
 }
 
+/**
+ * The voodoo is in the way I do lexical processing on grammar definition
+ * files. They contain embedded bits of PHP, and it's important to keep
+ * track of things like strings, comments, and matched braces. It seemed
+ * like an ideal problem to solve with GNU flex, so I wrote a little
+ * scanner in flex and C to dig out the tokens for me. Of course, I need
+ * the tokens in PHP, so I designed a simple binary wrapper for them which
+ * also contains line-number information, guaranteed to help out if you
+ * write a grammar which surprises the parser in any manner.
+ */
 class voodoo_scanner extends flex_scanner {
-	/*
-
-	The voodoo is in the way I do lexical processing on grammar definition
-	files. They contain embedded bits of PHP, and it's important to keep
-	track of things like strings, comments, and matched braces. It seemed
-	like an ideal problem to solve with GNU flex, so I wrote a little
-	scanner in flex and C to dig out the tokens for me. Of course, I need
-	the tokens in PHP, so I designed a simple binary wrapper for them which
-	also contains line-number information, guaranteed to help out if you
-	write a grammar which surprises the parser in any manner.
-
-	*/
 	function executable() { return LIME_DIR.'/lime_scan_tokens'; }
 }
 
+/**
+ * This is a good function to read because it teaches you how to interface
+ * with a Lime parser. I've tried to isolate out the bits that aren't
+ * instructive in that regard.
+ */
 function parse_lime_grammar($path) {
-	/*
-
-	This is a good function to read because it teaches you how to interface
-	with a Lime parser. I've tried to isolate out the bits that aren't
-	instructive in that regard.
-
-	*/
-	if (!class_exists('lime_metaparser')) lime_bootstrap();
+	if (!class_exists('lime_metaparser', false)) {
+		lime_bootstrap();
+	}
 
 	$parse_engine = new parse_engine(new lime_metaparser());
 	$scanner = new voodoo_scanner($path);
@@ -1284,10 +1288,9 @@ function parse_lime_grammar($path) {
 	}
 }
 
-
 if ($_SERVER['argv']) {
 	$code = '';
-	array_shift($_SERVER['argv']);	# Strip out the program name.
+	array_shift($_SERVER['argv']); // Strip out the program name.
 	foreach ($_SERVER['argv'] as $path) {
 		$code .= parse_lime_grammar($path);
 	}
