@@ -260,7 +260,7 @@ class calc extends lime_parser {
   function reduce_0_stmt_1($tokens, &$result) {
     // (0) stmt :=  exp
     $result = reset($tokens);
-    echo " -> "; echo $tokens[0]; echo "\n";
+    echo " -> "; echo $tokens[0][0] . ' = ' . $tokens[0][1]; echo "\n";
   }
 
   function reduce_1_stmt_2($tokens, &$result) {
@@ -276,60 +276,61 @@ class calc extends lime_parser {
   function reduce_2_exp_1($tokens, &$result) {
     // (2) exp :=  num
     $result = reset($tokens);
+    $result = array($tokens[0], $tokens[0]);
   }
 
   function reduce_3_exp_2($tokens, &$result) {
     // (3) exp :=  var
     $result = reset($tokens);
-    $result = get_variable($tokens[0]);
+    $result = array($tokens[0], get_variable($tokens[0]));
   }
 
   function reduce_4_exp_3($tokens, &$result) {
     // (4) exp :=  exp  '+'  exp
     $result = reset($tokens);
-    $result = '(' . $tokens[0] . ' + ' . $tokens[2] . ')';
+    $result = array('(' . $tokens[0][0] . ' + ' . $tokens[2][0] . ')', $tokens[0][1] + $tokens[2][1]);
   }
 
   function reduce_5_exp_4($tokens, &$result) {
     // (5) exp :=  exp  '-'  exp
     $result = reset($tokens);
-    $result = '(' . $tokens[0] . ' - ' . $tokens[2] . ')';
+    $result = array('(' . $tokens[0][0] . ' - ' . $tokens[2][0] . ')', $tokens[0][1] - $tokens[2][1]);
   }
 
   function reduce_6_exp_5($tokens, &$result) {
     // (6) exp :=  exp  '*'  exp
     $result = reset($tokens);
-    $result = '(' . $tokens[0] . ' * ' . $tokens[2] . ')';
+    $result = array('(' . $tokens[0][0] . ' * ' . $tokens[2][0] . ')', $tokens[0][1] * $tokens[2][1]);
   }
 
   function reduce_7_exp_6($tokens, &$result) {
     // (7) exp :=  exp  '/'  exp
     $result = reset($tokens);
-    $result = '(' . $tokens[0] . ' / ' . $tokens[2] . ')';
+    $result = array('(' . $tokens[0][0] . ' / ' . $tokens[2][0] . ')', $tokens[0][1] / $tokens[2][1]);
   }
 
   function reduce_8_exp_7($tokens, &$result) {
     // (8) exp :=  exp  '^'  exp
     $result = reset($tokens);
-    $result = '(' . $tokens[0] . ' ^ ' . $tokens[2] . ')';
+    $result = array('(' . $tokens[0][0] . ' ^ ' . $tokens[2][0] . ')', pow($tokens[0][1], $tokens[2][1]));
   }
 
   function reduce_9_exp_8($tokens, &$result) {
     // (9) exp :=  exp  '%'  exp
     $result = reset($tokens);
-    $result = '(' . $tokens[0] . ' % ' . $tokens[2] . ')';
+    $result = array('(' . $tokens[0][0] . ' % ' . $tokens[2][0] . ')', $tokens[0][1] % $tokens[2][1]);
   }
 
   function reduce_10_exp_9($tokens, &$result) {
     // (10) exp :=  '+'  exp
     $result = reset($tokens);
-    $result = '(+ ' . $tokens[1] . ')';
+    $result = array('(+ ' . $tokens[1][0] . ')', +($tokens[1][1]));
   }
 
   function reduce_11_exp_10($tokens, &$result) {
     // (11) exp :=  '-'  exp
     $result = reset($tokens);
-    $result = '(- ' . $tokens[1] . ')';
+    $result = array('(- ' . $tokens[1][0] . ')', -($tokens[1][1]));
   }
 
   function reduce_12_exp_11($tokens, &$result) {
