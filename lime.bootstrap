@@ -22,6 +22,7 @@ lit : $$ = new lime_glyph($1, NULL);
 to slot
 : $$ = new lime_rhs();
 rhs slot : $$->add($2);
+rhs prec tok : $$->set_prec_glyph($3);
 to rhs
 '{' code '}' : $$ = $2;
 to action
@@ -29,3 +30,6 @@ to action
 code php : $$.=$2;
 code '{' code '}' : $$.='{'.$3.'}';
 to code
+sym :
+lit :
+to tok

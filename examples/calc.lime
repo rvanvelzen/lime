@@ -3,6 +3,7 @@
 
 %left '+' '-'
 %left '*' '/'
+%right '^'
 
 stmt = exp { echo " -> "; echo $1; echo "\n"; }
 | var/v '=' exp/e {
@@ -18,6 +19,7 @@ exp = num
 | exp '-' exp { $$ = $1 - $3; }
 | exp '*' exp { $$ = $1 * $3; }
 | exp '/' exp { $$ = $1 / $3; }
+| exp '^' exp { $$ = pow($1, $3); }
 | '(' exp/$ ')'
 .
 

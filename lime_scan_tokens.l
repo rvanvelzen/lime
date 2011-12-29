@@ -63,6 +63,9 @@ BLOCKCMT	"/*"({CC}|{CX})*{CT}
 {BLOCKCMT}		{}
 "/"{WORD}+ |
 "/$"			out("lambda", yytext+1);
+"%prec"			{
+	tok("prec");
+}
 "%"{WORD}+ 		{
 	out("pragma", yytext+1);
 	yy_push_state(pragma);

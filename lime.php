@@ -160,11 +160,13 @@ class error extends step {
 
 class shift extends step {
 	public $q;
+	public $rule;
 
-	public function __construct(sym $sym, $q) {
+	public function __construct(sym $sym, $q, rule $rule) {
 		parent::__construct($sym);
 
 		$this->q = $q;
+		$this->rule = $rule;
 	}
 
 	public function instruction() {
@@ -178,7 +180,7 @@ class shift extends step {
 		bug_unless($that instanceof reduce);
 
 		// That being said, the resolution is a matter of precedence.
-		$shift_prec = $this->sym->right_prec;
+		$shift_prec = $this->rule->right_prec;
 		$reduce_prec = $that->rule->prec;
 
 		// If we don't have defined precedence levels for both options,
@@ -274,8 +276,8 @@ class state {
 		}
 	}
 
-	public function add_shift(sym $sym, $state) {
-		$this->add_instruction(new shift($sym, $state->id));
+	public function add_shift(sym $sym, $state, $rule) {
+		$this->add_instruction(new shift($sym, $state->id, $rule));
 	}
 
 	public function add_reduce(sym $sym, $rule) {
@@ -375,7 +377,7 @@ class sym {
 }
 
 class rule {
-	public function __construct($id, $sym, $rhs, $code, $look, $replace) {
+	public function __construct($id, $sym, $rhs, $code, $look, $replace, $prec_sym) {
 		bug_unless(is_int($look));
 
 		$this->id = $id;
@@ -384,8 +386,9 @@ class rule {
 		$this->code = $code;
 		$this->look = $look;
 		$this->replace = $replace;
-		//$this->prec_sym = $prec_sym;
+		$this->prec_sym = $prec_sym;
 		$this->prec = 0;
+		$this->right_prec = 0;
 		$this->first = array();
 		$this->epsilon = count($rhs);
 	}
@@ -401,15 +404,17 @@ class rule {
 		// is a reasonable alternative behaviour, but I don't see the big
 		// deal just now.
 
-		//$prec_sym = $this->prec_sym;
-		//if (!$prec_sym)
-		$prec_sym = $this->rightmost_terminal();
+		$prec_sym = $this->prec_sym;
+		if (!$prec_sym) {
+			$prec_sym = $this->rightmost_terminal();
+		}
 
 		if (!$prec_sym) {
 			return;
 		}
 
 		$this->prec = $prec_sym->left_prec;
+		$this->right_prec = $prec_sym->right_prec;
 	}
 
 	private function rightmost_terminal() {
@@ -664,7 +669,7 @@ class lime {
 		return "'{$real}'" . count($this->rule);
 	}
 
-	function add_raw_rule($lhs, $rhs, $code, $look, $replace) {
+	function add_raw_rule($lhs, $rhs, $code, $look, $replace, $prec_sym) {
 		$sym = $this->sym($lhs);
 		$sym->term = false;
 
@@ -679,7 +684,7 @@ class lime {
 		}
 
 		$rid = count($this->rule);
-		$r = new rule($rid, $sym, $rs, $code, $look, $replace);
+		$r = new rule($rid, $sym, $rs, $code, $look, $replace, $prec_sym);
 		$this->rule[$rid] = $r;
 		$sym->rule[] = $r;
 	}
@@ -754,7 +759,7 @@ class lime {
 		$candidate = current($this->start_symbol_set);
 
 		// Did the person try to set a start symbol at all?
-		if (!$candidate) {
+		if (!is_object($candidate)) {
 			return $this->first_rule_lhs();
 		}
 
@@ -862,7 +867,7 @@ class lime {
 			}
 
 			$dest = $this->get_state($basis);
-			$state->add_shift($this->sym($glyph), $dest);
+			$state->add_shift($this->sym($glyph), $dest, $segment[0]->rule);
 		}
 	}
 
@@ -1074,6 +1079,8 @@ class lime_language_php extends lime_language {
 }
 
 class lime_rhs {
+	public $prec_glyph;
+
 	function __construct() {
 		// Construct and add glyphs and actions in whatever order.
 		// Then, add this to a lime_rewrite.
@@ -1083,8 +1090,12 @@ class lime_rhs {
 		$this->rhs = array();
 	}
 
-	function add(lime_slot $slot) {
+	public function add(lime_slot $slot) {
 		$this->rhs[] = $slot;
+	}
+
+	public function set_prec_glyph($glyph) {
+		$this->prec_glyph = $glyph;
 	}
 
 	function install_rule(lime $lime, $lhs) {
@@ -1093,6 +1104,11 @@ class lime_rhs {
 		// First, make sure this thing is well-formed.
 		if (!(end($rhs) instanceof lime_action)) {
 			$rhs[] = new lime_action('', null);
+		}
+
+		$prec_sym = null;
+		if ($this->prec_glyph) {
+			$prec_sym = $lime->sym($this->prec_glyph);
 		}
 
 		// Now, split it into chunks based on the actions.
@@ -1118,12 +1134,12 @@ class lime_rhs {
 					// no.
 					$subsymbol = $lime->trump_up_bogus_lhs($lhs);
 					$action = $lang->default_result() . $preamble . $code;
-					$lime->add_raw_rule($subsymbol, $subrule, $action, $look, false);
+					$lime->add_raw_rule($subsymbol, $subrule, $action, $look, false, $prec_sym);
 					$subrule = array($subsymbol);
 				} else {
 					// yes.
 					$action = $result_code . $preamble . $code;
-					$lime->add_raw_rule($lhs, $subrule, $action, $look, true);
+					$lime->add_raw_rule($lhs, $subrule, $action, $look, true, $prec_sym);
 				}
 			} else {
 				impossible();

@@ -260,6 +260,18 @@ class parse_engine {
 		return explode(' ', $row[$type]);
 	}
 
+	private function get_steps() {
+		$out = array();
+		foreach($this->current_row() as $type => $row) {
+			list($opcode) = explode(' ', $row, 2);
+			if ($opcode != 'e') {
+				$out[] = $type;
+			}
+		}
+
+		return $out;
+	}
+
 	private function has_step_for($type) {
 		$row = $this->current_row();
 		return isset($row[$type]);
@@ -300,6 +312,9 @@ class parse_engine {
 			// flutter while the parse engine waits for an edible token.
 			// if ($this->debug) echo "($type) causes a problem.\n";
 
+			// get these before doing anything
+			$expected = $this->get_steps();
+
 			if ($this->enter_error_tolerant_state()) {
 				$this->eat('error', null);
 				if ($this->has_step_for($type)) {
@@ -307,7 +322,7 @@ class parse_engine {
 				}
 			} else {
 				// If that didn't work, give up:
-				throw new parse_error("Parse Error: ({$type})({$semantic}) not expected");
+				throw new parse_error("Parse Error: ({$type})({$semantic}) not expected, expected {" . implode(', ', $expected) . '}');
 			}
 			break;
 		default:
