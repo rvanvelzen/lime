@@ -18,10 +18,12 @@ class calc extends lime_parser {
   public $i = array(
     array(
       'exp' => 's 1',
-      'var' => 's 17',
+      'var' => 's 23',
       'num' => 's 3',
-      "'('" => 's 14',
-      'stmt' => 's 20',
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20',
+      'stmt' => 's 26',
       "'start'" => "a 'start'"
     ),
     array(
@@ -30,13 +32,16 @@ class calc extends lime_parser {
       "'*'" => 's 8',
       "'/'" => 's 10',
       "'^'" => 's 12',
+      "'%'" => 's 14',
       '#' => 'r 0'
     ),
     array(
       'num' => 's 3',
       'var' => 's 4',
       'exp' => 's 5',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 'r 2',
@@ -44,6 +49,7 @@ class calc extends lime_parser {
       "'*'" => 'r 2',
       "'/'" => 'r 2',
       "'^'" => 'r 2',
+      "'%'" => 'r 2',
       "')'" => 'r 2',
       '#' => 'r 2'
     ),
@@ -53,6 +59,7 @@ class calc extends lime_parser {
       "'*'" => 'r 3',
       "'/'" => 'r 3',
       "'^'" => 'r 3',
+      "'%'" => 'r 3',
       "')'" => 'r 3',
       '#' => 'r 3'
     ),
@@ -62,6 +69,7 @@ class calc extends lime_parser {
       "'*'" => 's 8',
       "'/'" => 's 10',
       "'^'" => 's 12',
+      "'%'" => 's 14',
       "')'" => 'r 4',
       '#' => 'r 4'
     ),
@@ -69,7 +77,9 @@ class calc extends lime_parser {
       'num' => 's 3',
       'var' => 's 4',
       'exp' => 's 7',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 'r 5',
@@ -77,6 +87,7 @@ class calc extends lime_parser {
       "'*'" => 's 8',
       "'/'" => 's 10',
       "'^'" => 's 12',
+      "'%'" => 's 14',
       "')'" => 'r 5',
       '#' => 'r 5'
     ),
@@ -84,7 +95,9 @@ class calc extends lime_parser {
       'num' => 's 3',
       'var' => 's 4',
       'exp' => 's 9',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 'r 6',
@@ -92,6 +105,7 @@ class calc extends lime_parser {
       "'*'" => 'r 6',
       "'/'" => 'r 6',
       "'^'" => 's 12',
+      "'%'" => 'r 6',
       "')'" => 'r 6',
       '#' => 'r 6'
     ),
@@ -99,7 +113,9 @@ class calc extends lime_parser {
       'num' => 's 3',
       'var' => 's 4',
       'exp' => 's 11',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 'r 7',
@@ -107,6 +123,7 @@ class calc extends lime_parser {
       "'*'" => 'r 7',
       "'/'" => 'r 7',
       "'^'" => 's 12',
+      "'%'" => 'r 7',
       "')'" => 'r 7',
       '#' => 'r 7'
     ),
@@ -114,7 +131,9 @@ class calc extends lime_parser {
       'num' => 's 3',
       'var' => 's 4',
       'exp' => 's 13',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 'r 8',
@@ -122,6 +141,7 @@ class calc extends lime_parser {
       "'*'" => 'r 8',
       "'/'" => 'r 8',
       "'^'" => 's 12',
+      "'%'" => 'r 8',
       "')'" => 'r 8',
       '#' => 'r 8'
     ),
@@ -129,7 +149,63 @@ class calc extends lime_parser {
       'num' => 's 3',
       'var' => 's 4',
       'exp' => 's 15',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
+    ),
+    array(
+      "'+'" => 'r 9',
+      "'-'" => 'r 9',
+      "'*'" => 'r 9',
+      "'/'" => 'r 9',
+      "'^'" => 's 12',
+      "'%'" => 'r 9',
+      "')'" => 'r 9',
+      '#' => 'r 9'
+    ),
+    array(
+      'num' => 's 3',
+      'var' => 's 4',
+      'exp' => 's 17',
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
+    ),
+    array(
+      "'+'" => 'r 10',
+      "'-'" => 'r 10',
+      "'*'" => 'r 10',
+      "'/'" => 'r 10',
+      "'^'" => 'r 10',
+      "'%'" => 'r 10',
+      "')'" => 'r 10',
+      '#' => 'r 10'
+    ),
+    array(
+      'num' => 's 3',
+      'var' => 's 4',
+      'exp' => 's 19',
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
+    ),
+    array(
+      "'+'" => 'r 11',
+      "'-'" => 'r 11',
+      "'*'" => 'r 11',
+      "'/'" => 'r 11',
+      "'^'" => 'r 11',
+      "'%'" => 'r 11',
+      "')'" => 'r 11',
+      '#' => 'r 11'
+    ),
+    array(
+      'num' => 's 3',
+      'var' => 's 4',
+      'exp' => 's 21',
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 's 2',
@@ -137,31 +213,36 @@ class calc extends lime_parser {
       "'*'" => 's 8',
       "'/'" => 's 10',
       "'^'" => 's 12',
-      "')'" => 's 16'
+      "'%'" => 's 14',
+      "')'" => 's 22'
     ),
     array(
-      "'^'" => 'r 9',
-      "'/'" => 'r 9',
-      "'*'" => 'r 9',
-      "'-'" => 'r 9',
-      "'+'" => 'r 9',
-      "')'" => 'r 9',
-      '#' => 'r 9'
+      "'%'" => 'r 12',
+      "'^'" => 'r 12',
+      "'/'" => 'r 12',
+      "'*'" => 'r 12',
+      "'-'" => 'r 12',
+      "'+'" => 'r 12',
+      "')'" => 'r 12',
+      '#' => 'r 12'
     ),
     array(
-      "'='" => 's 18',
+      "'='" => 's 24',
       "'+'" => 'r 3',
       "'-'" => 'r 3',
       "'*'" => 'r 3',
       "'/'" => 'r 3',
       "'^'" => 'r 3',
+      "'%'" => 'r 3',
       '#' => 'r 3'
     ),
     array(
-      'exp' => 's 19',
+      'exp' => 's 25',
       'num' => 's 3',
       'var' => 's 4',
-      "'('" => 's 14'
+      "'+'" => 's 16',
+      "'-'" => 's 18',
+      "'('" => 's 20'
     ),
     array(
       "'+'" => 's 2',
@@ -169,10 +250,11 @@ class calc extends lime_parser {
       "'*'" => 's 8',
       "'/'" => 's 10',
       "'^'" => 's 12',
+      "'%'" => 's 14',
       '#' => 'r 1'
     ),
     array(
-      '#' => 'r 10'
+      '#' => 'r 13'
     )
   );
   function reduce_0_stmt_1($tokens, &$result) {
@@ -205,40 +287,58 @@ class calc extends lime_parser {
   function reduce_4_exp_3($tokens, &$result) {
     // (4) exp :=  exp  '+'  exp
     $result = reset($tokens);
-    $result = $tokens[0] + $tokens[2];
+    $result = '(' . $tokens[0] . ' + ' . $tokens[2] . ')';
   }
 
   function reduce_5_exp_4($tokens, &$result) {
     // (5) exp :=  exp  '-'  exp
     $result = reset($tokens);
-    $result = $tokens[0] - $tokens[2];
+    $result = '(' . $tokens[0] . ' - ' . $tokens[2] . ')';
   }
 
   function reduce_6_exp_5($tokens, &$result) {
     // (6) exp :=  exp  '*'  exp
     $result = reset($tokens);
-    $result = $tokens[0] * $tokens[2];
+    $result = '(' . $tokens[0] . ' * ' . $tokens[2] . ')';
   }
 
   function reduce_7_exp_6($tokens, &$result) {
     // (7) exp :=  exp  '/'  exp
     $result = reset($tokens);
-    $result = $tokens[0] / $tokens[2];
+    $result = '(' . $tokens[0] . ' / ' . $tokens[2] . ')';
   }
 
   function reduce_8_exp_7($tokens, &$result) {
     // (8) exp :=  exp  '^'  exp
     $result = reset($tokens);
-    $result = pow($tokens[0], $tokens[2]);
+    $result = '(' . $tokens[0] . ' ^ ' . $tokens[2] . ')';
   }
 
   function reduce_9_exp_8($tokens, &$result) {
-    // (9) exp :=  '('  exp  ')'
+    // (9) exp :=  exp  '%'  exp
+    $result = reset($tokens);
+    $result = '(' . $tokens[0] . ' % ' . $tokens[2] . ')';
+  }
+
+  function reduce_10_exp_9($tokens, &$result) {
+    // (10) exp :=  '+'  exp
+    $result = reset($tokens);
+    $result = '(+ ' . $tokens[1] . ')';
+  }
+
+  function reduce_11_exp_10($tokens, &$result) {
+    // (11) exp :=  '-'  exp
+    $result = reset($tokens);
+    $result = '(- ' . $tokens[1] . ')';
+  }
+
+  function reduce_12_exp_11($tokens, &$result) {
+    // (12) exp :=  '('  exp  ')'
     $result = $tokens[1];
   }
 
-  function reduce_10_start_1($tokens, &$result) {
-    // (10) 'start' :=  stmt
+  function reduce_13_start_1($tokens, &$result) {
+    // (13) 'start' :=  stmt
     $result = reset($tokens);
   }
 
@@ -253,7 +353,10 @@ class calc extends lime_parser {
     'reduce_7_exp_6',
     'reduce_8_exp_7',
     'reduce_9_exp_8',
-    'reduce_10_start_1'
+    'reduce_10_exp_9',
+    'reduce_11_exp_10',
+    'reduce_12_exp_11',
+    'reduce_13_start_1'
   );
   public $a = array(
     array(
@@ -299,6 +402,21 @@ class calc extends lime_parser {
     array(
       'symbol' => 'exp',
       'len' => 3,
+      'replace' => true
+    ),
+    array(
+      'symbol' => 'exp',
+      'len' => 3,
+      'replace' => true
+    ),
+    array(
+      'symbol' => 'exp',
+      'len' => 2,
+      'replace' => true
+    ),
+    array(
+      'symbol' => 'exp',
+      'len' => 2,
       'replace' => true
     ),
     array(
