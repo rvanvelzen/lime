@@ -33,7 +33,7 @@ class parse_bug extends Exception {}
 
 class parse_unexpected_token extends parse_error {
 	public function __construct($type, $state) {
-		parent::__construct("Unexpected token of type ({$type})");
+		parent::__construct("Unexpected token of type {$type}");
 
 		$this->type = $type;
 		$this->state = $state;
@@ -322,7 +322,7 @@ class parse_engine {
 				}
 			} else {
 				// If that didn't work, give up:
-				throw new parse_error("Parse Error: ({$type})({$semantic}) not expected, expected {" . implode(', ', $expected) . '}');
+				throw new parse_error("Parse Error: {$type} ({$semantic}) not expected, expected {" . implode(', ', $expected) . '}');
 			}
 			break;
 		default:
