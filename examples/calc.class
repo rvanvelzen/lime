@@ -257,6 +257,10 @@ class calc extends lime_parser {
       '#' => 'r 13'
     )
   );
+  public $d = array(
+    "'+'" => 'plus sign (+)',
+    "'/'" => 'division (/)'
+  );
   function reduce_0_stmt_1($tokens, &$result) {
     // (0) stmt :=  exp
     $result = reset($tokens);

@@ -17,7 +17,7 @@
  */
 
 define('LIME_DIR', __DIR__);
-define('INDENT', '  ');
+
 
 function emit($str) {
 	fputs(STDERR, $str . PHP_EOL);
@@ -607,6 +607,8 @@ class config {
 class lime {
 	public $parser_class = 'parser';
 
+	public $descr = array();
+
 	public function __construct() {
 		$this->p_next = 1;
 		$this->sym = array();
@@ -652,8 +654,9 @@ class lime {
 		$i = $this->resolve_conflicts();
 		$a = $this->rule_table();
 		$qi = $initial->id;
+		$d = $this->descr;
 
-		return $this->lang->ptab_to_class($this->parser_class, compact('a', 'qi', 'i'));
+		return $this->lang->ptab_to_class($this->parser_class, compact('a', 'qi', 'i', 'd'));
 	}
 
 	function rule_table() {
@@ -697,6 +700,10 @@ class lime {
 	function sym($str, $description = null) {
 		if (!isset($this->sym[$str])) {
 			$this->sym[$str] = new sym($str, count($this->sym), $description);
+
+			if ($description) {
+				$this->descr[$str] = $description;
+			}
 		}
 
 		return $this->sym[$str];
@@ -1060,7 +1067,8 @@ class lime_language_php extends lime_language {
 	public function ptab_to_class($parser_class, $ptab) {
 		$code  = '';
 		$code .= 'public $qi = ' . lime_export($ptab['qi'], true) . ';' . PHP_EOL;
-		$code .= 'public $i = '.lime_export($ptab['i'], true).';' . PHP_EOL;
+		$code .= 'public $i = ' . lime_export($ptab['i'], true) . ';' . PHP_EOL;
+		$code .= 'public $d = ' . lime_export($ptab['d'], true) . ';' . PHP_EOL;
 
 		$rc = array();
 		$method = array();
@@ -1322,6 +1330,26 @@ function parse_lime_grammar($path) {
 
 if ($_SERVER['argv']) {
 	$code = '';
+
+	if (!defined('INDENT')) {
+		foreach($_SERVER['argv'] as $i => $opt) {
+			if ($opt === '--indent') {
+				$val = @$_SERVER['argv'][$i + 1];
+				if (!$val) {
+					define('INDENT', '  ');
+				} else {
+					define('INDENT', $val == 1 ? "\t" : str_repeat(' ', $val));
+				}
+				unset($_SERVER['argv'][$i], $_SERVER['argv'][$i + 1]);
+				break;
+			}
+		}
+
+		if (!defined('INDENT')) {
+			define('INDENT', '  ');
+		}
+	}
+
 	array_shift($_SERVER['argv']); // Strip out the program name.
 	foreach ($_SERVER['argv'] as $path) {
 		$code .= parse_lime_grammar($path);

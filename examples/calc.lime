@@ -1,6 +1,9 @@
 %class calc
 %start stmt
 
+%token '+' "plus sign (+)"
+%token '/' "division (/)"
+
 %left '+' '-'
 %left '*' '/' '%'
 %right '^'

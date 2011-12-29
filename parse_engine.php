@@ -106,6 +106,7 @@ class parse_engine {
 	public $qi;
 	public $rule;
 	public $step;
+	public $descr;
 	/**
 	 * @var boolean
 	 */
@@ -120,6 +121,7 @@ class parse_engine {
 		$this->qi = $parser->qi;
 		$this->rule = $parser->a;
 		$this->step = $parser->i;
+		$this->descr = $parser->d;
 
 		$this->reset();
 	}
@@ -324,11 +326,19 @@ class parse_engine {
 				}
 			} else {
 				// If that didn't work, give up:
-				throw new parse_error("Parse Error: {$type} ({$semantic}) not expected, expected {" . implode(', ', $expected) . '}');
+				throw new parse_error('Parse Error: ' . $this->descr($type, $semantic) . ' not expected, expected {' . implode(', ', $expected) . '}');
 			}
 			break;
 		default:
 			throw new parse_bug("Bad parse table instruction " . htmlspecialchars($opcode));
+		}
+	}
+
+	private function descr($type, $semantic) {
+		if (isset($this->descr[$type])) {
+			return $this->descr[$type];
+		} else {
+			return $type . ' (' . $semantic . ')';
 		}
 	}
 
