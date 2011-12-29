@@ -41,27 +41,26 @@ understanding how to use Lime.
 
 6. Integrate your parser as follows:
 
-	require 'lime/parse_engine.php';
-	require 'my_parser.php';
-	//
-	// Later:
-	//
-	$parser = new parse_engine(new my_parser());
-	//
-	// And still later:
-	//
-	try {
-		while (..something..) {
-			$parser->eat($type, $val);
-			// You figure out how to get the parameters.
+		require 'lime/parse_engine.php';
+		require 'my_parser.php';
+		//
+		// Later:
+		//
+		$parser = new parse_engine(new my_parser());
+		//
+		// And still later:
+		//
+		try {
+			while (..something..) {
+				$parser->eat($type, $val);
+				// You figure out how to get the parameters.
+			}
+			// And after the last token has been eaten:
+			$parser->eat_eof();
+		} catch (parse_error $e) {
+			die($e->getMessage());
 		}
-		// And after the last token has been eaten:
-		$parser->eat_eof();
-	} catch (parse_error $e) {
-		die($e->getMessage());
-	}
-
-	return $parser->semantic;
+		return $parser->semantic;
 
 7. You now have the computed semantic value of whatever you parsed. Add salt
 	and pepper to taste, and serve.
