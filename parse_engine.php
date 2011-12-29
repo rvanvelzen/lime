@@ -41,8 +41,8 @@ class parse_unexpected_token extends parse_error {
 }
 
 class parse_premature_eof extends parse_error {
-	public function __construct() {
-		parent::__construct('Premature EOF');
+	public function __construct(array $expect) {
+		parent::__construct('Premature EOF, expected {' . implode(', ', $expect) . '}');
 	}
 }
 
@@ -221,6 +221,8 @@ class parse_engine {
 	private function premature_eof() {
 		$seen = array();
 
+		$expect = $this->get_steps();
+
 		while ($this->enter_error_tolerant_state()) {
 			if (isset($seen[$this->state()])) {
 				// This means that it's pointless to try here.
@@ -244,7 +246,7 @@ class parse_engine {
 			}
 		}
 
-		throw new parse_premature_eof();
+		throw new parse_premature_eof($expect);
 	}
 
 	private function current_row() {

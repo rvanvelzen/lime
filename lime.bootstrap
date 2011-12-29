@@ -7,8 +7,11 @@ to grammar
 : {$$=array();}
 toklist sym : $$[] = $2;
 toklist lit : $$[] = $2;
+toklist num : $$[] = $2;
+toklist str : $$[] = substr($2, 1, -1);
 to toklist
 sym '=' rhs : $$ = new lime_rewrite($1); $$->add_rhs($3);
+sym ':' rhs : $$ = new lime_rewrite($1); $$->add_rhs($3);
 rewrite '|' rhs : $$->add_rhs($3);
 to rewrite
 list : $$ = new lime_rhs($1, '');

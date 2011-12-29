@@ -355,9 +355,10 @@ class state {
 }
 
 class sym {
-	public function __construct($name, $id) {
+	public function __construct($name, $id, $desc = null) {
 		$this->name = $name;
 		$this->id = $id;
+		$this->desc = $desc;
 		$this->term = true;	// Until proven otherwise.
 		$this->rule = array();
 		$this->config = array();
@@ -373,6 +374,10 @@ class sym {
 		}
 
 		return $out;
+	}
+
+	public function descr() {
+		return $this->descr ? $this->descr : $this->name;
 	}
 }
 
@@ -689,9 +694,9 @@ class lime {
 		$sym->rule[] = $r;
 	}
 
-	function sym($str) {
+	function sym($str, $description = null) {
 		if (!isset($this->sym[$str])) {
-			$this->sym[$str] = new sym($str, count($this->sym));
+			$this->sym[$str] = new sym($str, count($this->sym), $description);
 		}
 
 		return $this->sym[$str];
@@ -999,6 +1004,17 @@ class lime {
 		case 'class':
 			$this->parser_class = $args[0];
 			break;
+		case 'expect':
+			if (!ctype_digit($args[0])) {
+				emit(sprintf('Bad expect pragma: %s', $args[0]));
+				exit(1);
+			}
+
+			$this->expect_conflicts = $args[0];
+			break;
+		case 'token':
+			$this->sym($args[0], @$args[1]);
+			break;
 		default:
 			emit(sprintf('Bad Parser Pragma: (%s)', $type));
 			exit(1);
@@ -1233,7 +1249,7 @@ function lime_bootstrap() {
 	bug_unless(is_readable($bootstrap));
 
 	foreach(file($bootstrap) as $l) {
-		$a = explode(':', $l, 2);
+		$a = preg_split('~(?<=\s|^):(?=\s|$)~', $l, 2);
 
 		if (count($a) == 2) {
 			list($pattern, $code) = $a;

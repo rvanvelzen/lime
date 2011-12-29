@@ -34,7 +34,7 @@ ALPHA		[a-zA-Z]
 DIGIT		[0-9]
 ALNUM		{ALPHA}|{DIGIT}
 WORD		{ALNUM}|_
-STOP		"."
+STOP		"."|";"
 
 SYM			{ALPHA}{WORD}*'*
 LIT			'.'
@@ -87,6 +87,10 @@ BLOCKCMT	"/*"({CC}|{CX})*{CT}
 	[[:space:]]	{}
 	{SYM} 		tok("sym");
 	{LIT}		tok("lit");
+	{DIGIT}		tok("num");
+	\"{DCHAR}*\" tok("str");
+	'{SCHAR}*'	tok("str");
+	
 	.			lit();
 }
 
