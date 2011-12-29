@@ -355,10 +355,9 @@ class state {
 }
 
 class sym {
-	public function __construct($name, $id, $desc = null) {
+	public function __construct($name, $id) {
 		$this->name = $name;
 		$this->id = $id;
-		$this->desc = $desc;
 		$this->term = true;	// Until proven otherwise.
 		$this->rule = array();
 		$this->config = array();
@@ -374,10 +373,6 @@ class sym {
 		}
 
 		return $out;
-	}
-
-	public function descr() {
-		return $this->descr ? $this->descr : $this->name;
 	}
 }
 
@@ -699,11 +694,11 @@ class lime {
 
 	function sym($str, $description = null) {
 		if (!isset($this->sym[$str])) {
-			$this->sym[$str] = new sym($str, count($this->sym), $description);
+			$this->sym[$str] = new sym($str, count($this->sym));
+		}
 
-			if ($description) {
-				$this->descr[$str] = $description;
-			}
+		if ($description) {
+			$this->descr[$str] = $description;
 		}
 
 		return $this->sym[$str];
