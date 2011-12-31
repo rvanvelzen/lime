@@ -54,6 +54,8 @@ function lime_token_reference_callback($foo) {
 	if ($foo[1] === '$') {
 		// always
 		return '$result';
+	} elseif (!ctype_digit($foo[1])) {
+		return '$' . $foo[1];
 	}
 
 	return lime_token_reference($foo[1] - 1);
