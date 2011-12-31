@@ -1348,6 +1348,9 @@ if ($_SERVER['argv']) {
 	}
 
 	array_shift($_SERVER['argv']); // Strip out the program name.
+
+	$timer = microtime(true);
+
 	foreach ($_SERVER['argv'] as $path) {
 		$code .= parse_lime_grammar($path);
 	}
@@ -1370,4 +1373,8 @@ if ($_SERVER['argv']) {
  */
 {$code}
 CODE;
+
+echo PHP_EOL
+	. '// Time: ' . (microtime(true) - $timer) . ' seconds' . PHP_EOL
+	. '// Memory: ' . memory_get_peak_usage() . ' bytes' . PHP_EOL;
 }
