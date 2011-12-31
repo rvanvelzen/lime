@@ -102,11 +102,14 @@ class parse_stack {
 }
 
 class parse_engine {
+	public $debug = false;
+
 	public $parser;
 	public $qi;
 	public $rule;
 	public $step;
 	public $descr;
+	public $errors = array();
 	/**
 	 * @var boolean
 	 */
@@ -129,6 +132,7 @@ class parse_engine {
 	public function reset() {
 		$this->accept = false;
 		$this->stack = new parse_stack($this->qi);
+		$this->errors = array();
 	}
 
 	private function enter_error_tolerant_state() {
@@ -136,6 +140,9 @@ class parse_engine {
 			if ($this->has_step_for('error')) {
 				return true;
 			}
+
+			if ($this->debug) echo "Dropped an item from the stack, {" . implode(', ', $this->get_steps()) . "} left\n";
+			if ($this->debug) echo 'Currently in state ' . $this->state() . "\n";
 
 			$this->drop();
 		}
@@ -225,7 +232,7 @@ class parse_engine {
 
 		$expect = $this->get_steps();
 
-		while ($this->enter_error_tolerant_state()) {
+		while ($this->enter_error_tolerant_state() || $this->has_step_for('error')) {
 			if (isset($seen[$this->state()])) {
 				// This means that it's pointless to try here.
 				// We're guaranteed that the stack is occupied.
@@ -235,7 +242,7 @@ class parse_engine {
 
 			$seen[$this->state()] = true;
 
-			$this->eat('error', null);
+			$this->eat('error', 'Premature EOF');
 
 			if ($this->has_step_for('#')) {
 				// Good. We can continue as normal.
@@ -293,16 +300,17 @@ class parse_engine {
 
 	function eat($type, $semantic) {
 		// assert('$type == trim($type)');
-		// if ($this->debug) echo "Trying to eat a ($type)\n";
+		if ($this->debug) echo "Trying to eat a ($type)\n";
 		list($opcode, $operand) = $this->step_for($type);
 
 		switch ($opcode) {
 		case 's':
-			// if ($this->debug) echo "shift $type to state $operand\n";
+			if ($this->debug) echo "shift $type to state $operand\n";
 			$this->stack->shift($operand, $semantic);
 			// echo $this->stack->text()." shift $type<br/>\n";
 			break;
 		case 'r':
+			if ($this->debug) echo "Reducing $type via rule $operand\n";
 			$this->reduce($operand);
 			$this->eat($type, $semantic);
 			// Yes, this is tail-recursive. It's also the simplest way.
@@ -313,20 +321,24 @@ class parse_engine {
 			}
 
 			$this->accept = true;
-			//if ($this->debug) echo ("Accept\n\n");
+			if ($this->debug) echo ("Accept\n\n");
 			$this->semantic = $semantic;
 			break;
 		case 'e':
 			// This is thought to be the uncommon, exceptional path, so
 			// it's OK that this algorithm will cause the stack to
 			// flutter while the parse engine waits for an edible token.
-			// if ($this->debug) echo "($type) causes a problem.\n";
+			if ($this->debug) echo "($type) causes a problem.\n";
 
 			// get these before doing anything
 			$expected = $this->get_steps();
 
-			if ($this->enter_error_tolerant_state()) {
-				$this->eat('error', null);
+			$this->errors[] = $this->descr($type, $semantic) . ' not expected, expected {' . implode(', ', $expected) . '}';
+
+			if ($this->debug) echo "Possibilities before error fixing: {" . implode(', ', $expected) . "}\n";
+
+			if ($this->enter_error_tolerant_state() || $this->has_step_for('error')) {
+				$this->eat('error', end($this->errors));
 				if ($this->has_step_for($type)) {
 					$this->eat($type, $semantic);
 				}

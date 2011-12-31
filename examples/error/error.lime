@@ -1,0 +1,27 @@
+#program: slist { var_dump($1); $$ = $1; };
+
+slist:
+  slist stmt ';' {
+    printf("slist stmt\n");
+    $$ = array($1, $2);
+  }
+| stmt ';' {
+    printf("stmt\n");
+    $$ = $1;
+  }
+| error ';' {
+    printf("error\n");
+    $$ = 'error';
+  }
+;
+
+stmt:
+  ZZ stmt {
+    printf("ZZ stmt\n");
+    $$ = array($1, $2);
+  }
+| ZZ {
+    printf("ZZ\n");
+    $$ = array($1);
+  }
+; 

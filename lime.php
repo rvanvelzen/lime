@@ -470,7 +470,7 @@ class rule {
 			$symbol_after_the_dot = $this->rhs[$dot];
 			$first = $symbol_after_the_dot->first->all();
 
-			bug_if(empty($first) and !$symbol_after_the_dot->lambda);
+			bug_if(empty($first) and !$symbol_after_the_dot->lambda and $symbol_after_the_dot->name != 'error');
 
 			$set = new set($first);
 			if ($symbol_after_the_dot->lambda) {

@@ -6,10 +6,12 @@ and use it in another calculation like:
 
 <?
 
-include_once "../parse_engine.php";
+include_once "../../parse_engine.php";
 include_once "calc.class";
 
-
+function nan_or($l, $r, $or) {
+	return !is_numeric($l) || !is_numeric($r) || is_nan($l) || is_nan($r) ? NaN : $or;
+}
 
 function tokenize($line) {
 	// Numbers are tokens, as are all other non-whitespace characters.

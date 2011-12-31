@@ -1,0 +1,117 @@
+%class calc
+%start stmt
+
+%token '+' "plus operator (+)"
+%token '-' "minus operator (-)"
+%token '*' "multiplication operator (*)"
+%token '/' "division operator (/)"
+%token '%' "modulo operator (%)"
+%token '^' "exponentiation operator (^)"
+
+%left '+' '-'
+%left '*' '/' '%'
+%right '^'
+%right T_INC
+
+stmt = exp {
+    echo ' -> ';
+    echo $1[0] . ' = ' . $1[1];
+    echo "\n";
+  }
+| var/v '=' exp/e {
+    echo $v . ' = ' . $e . "\n";
+    set_variable($v, $e);
+  }
+.
+
+
+exp = num {
+    $$ = array($1, $1);
+  }
+| var {
+    $$ = array($1, get_variable($1));
+  }
+| exp '+' exp {
+    $$ = array(
+      '(' . $1[0] . ' + ' . $3[0] . ')',
+      nan_or($1[1], $3[1], $1[1] + $3[1])
+    );
+  }
+| exp '-' exp {
+    $$ = array(
+      '(' . $1[0] . ' - ' . $3[0] . ')',
+      nan_or($1[1], $3[1], $1[1] - $3[1])
+    );
+  }
+| exp '*' exp {
+    $$ = array(
+      '(' . $1[0] . ' * ' . $3[0] . ')',
+      nan_or($1[1], $3[1], $1[1] * $3[1])
+    );
+  }
+| exp '/' exp {
+    $$ = array(
+      '(' . $1[0] . ' / ' . $3[0] . ')',
+      nan_or($1[1], $3[1], $1[1] / $3[1])
+    );
+  }
+| exp '^' exp {
+    $$ = array(
+      '(' . $1[0] . ' ^ ' . $3[0] . ')',
+      nan_or($1[1], $3[1], pow($1[1], $3[1]))
+    );
+  }
+| exp '%' exp {
+    $$ = array(
+      '(' . $1[0] . ' % ' . $3[0] . ')',
+      nan_or($1[1], $3[1], $1[1] % $3[1])
+    );
+  }
+| '+' exp %prec T_INC {
+    $$ = array(
+      '(+ ' . $2[0] . ')',
+      nan_or($1[1], $3[1], +($2[1]))
+    );
+  }
+| '-' exp %prec T_INC {
+    $$ = array(
+      '(- ' . $2[0] . ')',
+      nan_or($1[1], $3[1], -($2[1]))
+    );
+  }
+| '(' exp/$ ')'
+| var '(' param_list ')' {
+    $$ = array(
+      // little bits of voodoo to make this happen
+      '(' . $1 . '(' .
+        implode(', ', array_map(function ($a) {
+          return $a[0];
+        }, $3)) .
+      '))',
+      call_user_func_array($1, array_map(function ($a) {
+        return $a[1];
+      }, $3))
+    );
+  }
+| error {
+    printf("Error\n");
+    $$ = array('NaN', NaN);
+  }
+.
+
+param_list:
+  /* empty */ {
+    $$ = array();
+  }
+| non_empty_param_list
+.
+
+non_empty_param_list:
+  exp {
+    $$ = array($1);
+  }
+| non_empty_param_list ',' exp {
+    $1[] = $3;
+    $$ = $1;
+  }
+.
