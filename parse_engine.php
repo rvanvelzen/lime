@@ -42,7 +42,7 @@ class parse_unexpected_token extends parse_error {
 
 class parse_premature_eof extends parse_error {
 	public function __construct(array $expect) {
-		parent::__construct('Premature EOF, expected {' . implode(', ', $expect) . '}');
+		parent::__construct('Premature EOF');
 	}
 }
 
@@ -267,6 +267,12 @@ class parse_engine {
 	private function get_steps() {
 		$out = array();
 		foreach($this->current_row() as $type => $row) {
+			foreach($this->rule as $rule) {
+				if ($rule['symbol'] == $type) {
+					continue 2;
+				}
+			}
+
 			list($opcode) = explode(' ', $row, 2);
 			if ($opcode != 'e') {
 				$out[] = $type;
