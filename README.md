@@ -1,7 +1,7 @@
 Lime: An LALR(1) parser generator in and for PHP.
 =================================================
 
-_Interpretter pattern got you down? Time to use a real parser? Welcome to Lime._
+_Interpreter pattern got you down? Time to use a real parser? Welcome to Lime._
 
 If you're familiar with BISON or YACC, you may want to read the metagrammar.
 It's written in the Lime input language, so you'll get a head-start on
