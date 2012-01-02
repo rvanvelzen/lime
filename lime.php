@@ -183,7 +183,7 @@ class shift extends step {
 
 		// That being said, the resolution is a matter of precedence.
 		$shift_prec = $this->rule->right_prec;
-		$reduce_prec = $that->rule->prec;
+		$reduce_prec = $that->rule->left_prec;
 
 		// If we don't have defined precedence levels for both options,
 		// then we default to shifting:
@@ -344,12 +344,9 @@ class state {
 		$f = array();
 
 		foreach ($this->close as $c) {
-			$p = $c->symbol_after_the_dot;
-			if (!$p) {
-				continue;
+			if (($p = $c->symbol_after_the_dot)) {
+				$f[$p->name][] = $c;
 			}
-
-			$f[$p->name][] = $c;
 		}
 
 		return $f;
@@ -389,7 +386,7 @@ class rule {
 		$this->look = $look;
 		$this->replace = $replace;
 		$this->prec_sym = $prec_sym;
-		$this->prec = 0;
+		$this->left_prec = 0;
 		$this->right_prec = 0;
 		$this->first = array();
 		$this->epsilon = count($rhs);
@@ -415,7 +412,7 @@ class rule {
 			return;
 		}
 
-		$this->prec = $prec_sym->left_prec;
+		$this->left_prec = $prec_sym->left_prec;
 		$this->right_prec = $prec_sym->right_prec;
 	}
 
