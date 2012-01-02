@@ -78,18 +78,18 @@ BLOCKCMT "/*"({CC}|{CX})*{CT}
 
 
 <pragma>{
-	\n			{
+	\n {
 		out("stop", ".");
 		yy_pop_state();
 	}
 	[[:space:]]	{}
-	{SYM} 		tok("sym");
-	{LIT}		tok("lit");
-	{DIGIT}		tok("num");
+	{SYM} tok("sym");
+	{LIT} tok("lit");
+	{DIGIT} tok("num");
 	\"{DCHAR}*\" tok("str");
-	'{SCHAR}*'	tok("str");
+	'{SCHAR}*' tok("str");
 	
-	.			lit();
+	. lit();
 }
 
 <code>{
