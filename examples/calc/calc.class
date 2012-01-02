@@ -359,6 +359,7 @@ class calc extends lime_parser {
     "'%'" => 'modulo operator (%)',
     "'^'" => 'exponentiation operator (^)'
   );
+  public $errors = array();
   function reduce_0_stmt_1($tokens, &$result) {
     // (0) stmt :=  exp
     $result = reset($tokens);
@@ -660,5 +661,5 @@ class calc extends lime_parser {
   );
 }
 
-// Time: 0.12659001350403 seconds
-// Memory: 2765212 bytes
+// Time: 0.093108177185059 seconds
+// Memory: 2768108 bytes

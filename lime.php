@@ -1063,6 +1063,7 @@ class lime_language_php extends lime_language {
 		$code .= 'public $qi = ' . lime_export($ptab['qi'], true) . ';' . PHP_EOL;
 		$code .= 'public $i = ' . lime_export($ptab['i'], true) . ';' . PHP_EOL;
 		$code .= 'public $d = ' . lime_export($ptab['d'], true) . ';' . PHP_EOL;
+		$code .= 'public $errors = array();' . PHP_EOL;
 
 		$rc = array();
 		$method = array();

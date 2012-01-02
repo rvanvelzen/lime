@@ -109,7 +109,6 @@ class parse_engine {
 	public $rule;
 	public $step;
 	public $descr;
-	public $errors = array();
 	/**
 	 * @var boolean
 	 */
@@ -132,7 +131,7 @@ class parse_engine {
 	public function reset() {
 		$this->accept = false;
 		$this->stack = new parse_stack($this->qi);
-		$this->errors = array();
+		$this->parser->errors = array();
 	}
 
 	private function enter_error_tolerant_state() {
@@ -333,7 +332,7 @@ class parse_engine {
 			// get these before doing anything
 			$expected = $this->get_steps();
 
-			$this->errors[] = $this->descr($type, $semantic) . ' not expected, expected {' . implode(', ', $expected) . '}';
+			$this->parser->errors[] = $this->descr($type, $semantic) . ' not expected, expected {' . implode(', ', $expected) . '}';
 
 			if ($this->debug) echo "Possibilities before error fixing: {" . implode(', ', $expected) . "}\n";
 

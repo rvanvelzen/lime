@@ -61,6 +61,7 @@ class parser extends lime_parser {
   public $d = array(
 
   );
+  public $errors = array();
   function reduce_0_slist_1($tokens, &$result) {
     // (0) slist :=  slist  stmt  ';'
     $result = reset($tokens);
@@ -148,5 +149,5 @@ class parser extends lime_parser {
   );
 }
 
-// Time: 0.039383888244629 seconds
-// Memory: 1514364 bytes
+// Time: 0.032855033874512 seconds
+// Memory: 1516852 bytes
