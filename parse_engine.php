@@ -29,7 +29,8 @@ class parse_error extends Exception {
 /**
  * Bug, I made a mistake
  */
-class parse_bug extends Exception {}
+class parse_bug extends Exception {
+}
 
 class parse_unexpected_token extends parse_error {
 	public function __construct($type, $state) {
@@ -205,7 +206,6 @@ class parse_engine {
 				break;
 			default:
 				throw new parse_bug();
-				break;
 			}
 		} while ($this->stack->occupied());
 

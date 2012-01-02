@@ -156,7 +156,7 @@ class error extends step {
 
 	public function decide($that) {
 		// An error shall remain one
-		return $this;
+		return array($this);
 	}
 }
 
@@ -188,21 +188,21 @@ class shift extends step {
 		// If we don't have defined precedence levels for both options,
 		// then we default to shifting:
 		if (!($shift_prec and $reduce_prec)) {
-			return $this;
+			return array($this, 1);
 		}
 
 		// Otherwise, use the step with higher precedence.
 		if ($shift_prec > $reduce_prec) {
-			return $this;
+			return array($this, 0);
 		}
 
 		if ($reduce_prec > $shift_prec) {
-			return $that;
+			return array($that, 0);
 		}
 
 		// The "nonassoc" works by giving equal precedence to both options,
 		// which means to put an error instruction in the parse table.
-		return new error($this->sym);
+		return array(new error($this->sym), 0);
 	}
 }
 
@@ -236,7 +236,7 @@ class accept extends step {
 	}
 
 	public function decide($that) {
-		return $this;
+		return array($this, 0);
 	}
 }
 
@@ -262,6 +262,7 @@ class state {
 	public $id;
 	public $key;
 	public $close;
+	public $conflicts = 0;
 	public $action = array();
 
 	public function __construct($id, $key, $close) {
@@ -314,7 +315,8 @@ class state {
 				// There's a conflict. The shifts all came first, which
 				// simplifies the coding for the step->decide() methods.
 				try {
-					$table[$glyph] = $table[$glyph]->decide($step);
+					list($table[$glyph], $conflict) = $table[$glyph]->decide($step);
+					$this->conflicts += $conflict;
 				} catch (RRC $e) {
 					emit('State ' . $this->id . ':');
 					$e->make_noise();
@@ -437,6 +439,10 @@ class rule {
 			$t .= '  ' . $s->name;
 		}
 
+		if (!$this->rhs) {
+			$t .= '  ε';
+		}
+
 		return $t;
 	}
 
@@ -513,6 +519,10 @@ class rule {
 			}
 
 			$out .= '  ' . $s->name;
+		}
+
+		if (!$this->rhs) {
+			$out .= '  ε';
 		}
 
 		if ($dot > $idx) {
@@ -610,6 +620,8 @@ class lime {
 		$this->start_symbol_set = array();
 		$this->state = array();
 		$this->stop = $this->sym('#');
+		$this->expect_conflicts = null;
+		$this->conflicts = 0;
 
 		if ($err = $this->sym('error')) {
 			$err->term = false;
@@ -649,6 +661,10 @@ class lime {
 		$a = $this->rule_table();
 		$qi = $initial->id;
 		$d = $this->descr;
+
+		if ($this->expect_conflicts !== null && $this->expect_conflicts != $this->conflicts) {
+			throw new Bug($this->expect_conflicts .' conflicts expected, got ' . $this->conflicts);
+		}
 
 		return $this->lang->ptab_to_class($this->parser_class, compact('a', 'qi', 'i', 'd'));
 	}
@@ -756,12 +772,11 @@ class lime {
 		$rewrite = new lime_rewrite("'start'");
 		$rhs = new lime_rhs();
 		$rhs->add(new lime_glyph($this->deduce_start_symbol()->name, null));
-		//$rhs->add(new lime_glyph($this->stop->name, null));
 		$rewrite->add_rhs($rhs);
 		$rewrite->update($this);
 	}
 
-	private function deduce_start_symbol() {
+	protected function deduce_start_symbol() {
 		$candidate = current($this->start_symbol_set);
 
 		// Did the person try to set a start symbol at all?
@@ -854,10 +869,6 @@ class lime {
 
 					$q[] = $station;
 				}
-				// The following turned out to be wrong. Don't do it.
-				//if ($symbol_after_the_dot->lambda) {
-				//	$q[] = $config->next();
-				//}
 			}
 		}
 
@@ -934,6 +945,7 @@ class lime {
 
 		foreach ($this->state as $s) {
 			$i[$s->id] = $s->resolve_conflicts();
+			$this->conflicts += $s->conflicts;
 		}
 
 		return $i;
