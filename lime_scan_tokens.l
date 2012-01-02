@@ -14,9 +14,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 %{
-void out(char*t, char*v);
+void out(char* t, char* v);
 void lit();
-void tok(char*t);
+void tok(char* t);
 void php();
 %}
 
@@ -28,55 +28,53 @@ void php();
 %x dquote
 %x squote
 
-CHAR		\n|.
+CHAR     \n|.
 
-ALPHA		[a-zA-Z]
-DIGIT		[0-9]
-ALNUM		{ALPHA}|{DIGIT}
-WORD		{ALNUM}|_
-STOP		"."|";"
+ALPHA    [a-zA-Z]
+DIGIT    [0-9]
+ALNUM    {ALPHA}|{DIGIT}
+WORD     {ALNUM}|_
+STOP     "."|";"
 
-SYM			{ALPHA}{WORD}*'*
-LIT			'.'
+SYM      {ALPHA}{WORD}*'*
+LIT      '.'
 
-ESC			"\"{CHAR}
-SCHAR		[^\']|ESC
-DCHAR		[^\"]|ESC
-COM			"//"|"#"
+ESC      "\"{CHAR}
+SCHAR    [^\']|ESC
+DCHAR    [^\"]|ESC
+COM      "//"|"#"
 
-CC			[^*\n]
-CX			"*"+{CC}+
-CT			"*"+"/"
-BLOCKCMT	"/*"({CC}|{CX})*{CT}
+CC       [^*\n]
+CX       "*"+{CC}+
+CT       "*"+"/"
+BLOCKCMT "/*"({CC}|{CX})*{CT}
 
 %x pragma
 
 
 %%
 
-[[:space:]]+	{}
-#.*				{}
+[[:space:]]+ {}
+#.* {}
 
-{STOP} 			out("stop", ".");
-{SYM} 			tok("sym");
-{LIT}			tok("lit");
-{BLOCKCMT}		{}
+{STOP} out("stop", ".");
+{SYM} tok("sym");
+{LIT} tok("lit");
+{BLOCKCMT} {}
 "/"{WORD}+ |
-"/$"			out("lambda", yytext+1);
-"%prec"			{
-	tok("prec");
-}
-"%"{WORD}+ 		{
+"/$" out("lambda", yytext+1);
+"%prec" tok("prec");
+"%"{WORD}+ {
 	out("pragma", yytext+1);
 	yy_push_state(pragma);
 }
 
-<*>"{"			{
+<*>"{" {
 	lit();
 	yy_push_state(code);
 }
 
-.				lit();
+. lit();
 
 
 <pragma>{
@@ -95,16 +93,16 @@ BLOCKCMT	"/*"({CC}|{CX})*{CT}
 }
 
 <code>{
-	"}"			{
+	"}" {
 		lit();
 		yy_pop_state();
 	}
-	'{SCHAR}*'		php();
-	\"{DCHAR}*\"	php();
-	{COM}.*			php();
-	{BLOCKCMT}		php();
-	[^{}'"#/]+		php();
-	.				php();
+	'{SCHAR}*' php();
+	\"{DCHAR}*\" php();
+	{COM}.* php();
+	{BLOCKCMT} php();
+	[^{}'"#/]+ php();
+	. php();
 }
 
 %%
@@ -115,7 +113,7 @@ void lit() {
 	out(lit, yytext);
 }
 
-void tok(char*t) {
+void tok(char* t) {
 	out(t, yytext);
 }
 
@@ -123,7 +121,7 @@ void php() {
 	out("php", yytext);
 }
 
-void out(char*type, char*value) {
+void out(char* type, char* value) {
 	printf("%d\001%s\001%s", yylineno, type, value);
 	fputc(0, stdout);
 }
