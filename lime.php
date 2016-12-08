@@ -1,5 +1,6 @@
 #!/usr/bin/php -q
-<?php
+<?php namespace lime;
+
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@ function emit($str) {
 	fputs(STDERR, $str . PHP_EOL);
 }
 
-class Bug extends Exception {
+class Bug extends \Exception {
 }
 
 function bug($gripe = 'Bug found.') {
@@ -240,7 +241,7 @@ class accept extends step {
 	}
 }
 
-class RRC extends Exception {
+class RRC extends \Exception {
 	public function __construct($a, $b) {
 		parent::__construct('Reduce-Reduce Conflict');
 
@@ -1103,7 +1104,7 @@ class lime_language_php extends lime_language {
 		$code .= 'public $method = ' . lime_export($method, true) . ';' . PHP_EOL;
 		$code .= 'public $a = '.lime_export($rules, true) . ';' . PHP_EOL;
 
-		return 'class ' . $parser_class . ' extends lime_parser {' . PHP_EOL .
+		return "namespace lime;\nclass " . $parser_class . ' extends lime_parser {' . PHP_EOL .
 			preg_replace(array('~^~m', '~^\h+$~m'), array(INDENT, ''), $code) .
 		'}' . PHP_EOL;
 	}

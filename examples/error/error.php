@@ -1,4 +1,4 @@
-<?php
+<?php namespace lime;
 include_once "../../parse_engine.php";
 include_once "error.class";
 

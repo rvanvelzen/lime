@@ -1,4 +1,4 @@
-<?php
+<?php namespace lime;
 
 /*
 File: set.so.php

@@ -1,4 +1,4 @@
-<?php
+<?php namespace lime;
 /**
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@ abstract class lime_parser {
 /**
  * The input doesn't match the grammar
  */
-class parse_error extends Exception {
+class parse_error extends \Exception {
 }
 
 /**
  * Bug, I made a mistake
  */
-class parse_bug extends Exception {
+class parse_bug extends \Exception {
 }
 
 class parse_unexpected_token extends parse_error {

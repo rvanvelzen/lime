@@ -13,6 +13,7 @@
  * If you ignore this warning, you're shooting yourself in the brain,
  * not the foot.
  */
+namespace lime;
 class calc extends lime_parser {
   public $qi = 0;
   public $i = array(
@@ -504,7 +505,7 @@ class calc extends lime_parser {
   }
 
   function reduce_15_param_list_1($tokens, &$result) {
-    // (15) param_list :=
+    // (15) param_list :=  ε
     $result = reset($tokens);
 
     $result = array();
@@ -661,5 +662,5 @@ class calc extends lime_parser {
   );
 }
 
-// Time: 0.093108177185059 seconds
-// Memory: 2768108 bytes
+// Time: 0.02726411819458 seconds
+// Memory: 3137008 bytes
