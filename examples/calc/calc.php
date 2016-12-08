@@ -1,10 +1,11 @@
+<?php namespace lime; ?>
 This program is like a calculator. Type in lines of math, and it will
 print the results. You can set a variable with:
 	foo = 12 + 7.3
 and use it in another calculation like:
 	23.14 - foo
 
-<?
+<?php
 
 include_once "../../parse_engine.php";
 include_once "calc.class";

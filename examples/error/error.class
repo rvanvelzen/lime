@@ -13,6 +13,7 @@
  * If you ignore this warning, you're shooting yourself in the brain,
  * not the foot.
  */
+namespace lime;
 class parser extends lime_parser {
   public $qi = 0;
   public $i = array(
@@ -149,5 +150,5 @@ class parser extends lime_parser {
   );
 }
 
-// Time: 0.032855033874512 seconds
-// Memory: 1516852 bytes
+// Time: 0.0099399089813232 seconds
+// Memory: 1577792 bytes

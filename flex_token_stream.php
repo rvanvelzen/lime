@@ -1,4 +1,4 @@
-<?php
+<?php namespace lime;
 /**
  * Let's face it: PHP is not up to lexical processing. GNU flex handles
  * it well, so I've created a little protocol for delegating the work.
